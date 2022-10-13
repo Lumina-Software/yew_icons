@@ -63,10 +63,14 @@ fn main() {
             let contents = read(&path).expect(&path);
             let svg = std::str::from_utf8(&contents).unwrap();
 
-            let svg = class_regex.replace_all(&svg, "");
+            let svg = class_regex.replace_all(svg, "");
 
             assert!(!svg.contains(r#"title="#), "already had title: {}", path);
-            assert!(!svg.contains(r#"class="#), "already had class despite regex: {}", path);
+            assert!(
+                !svg.contains(r#"class="#),
+                "already had class despite regex: {}",
+                path
+            );
 
             // Ids not supported in HTML context.
             let svg = clip_path_regex.replace_all(&svg, " ").into_owned();
@@ -75,7 +79,10 @@ fn main() {
             let svg = svg.replace(r##"<?xml version="1.0" encoding="UTF-8"?>"##, "");
 
             // https://github.com/yammadev/flag-icons/blob/bd4bcf4f4829002cd10416029e05ba89a7554af4/svg/CSA.svg
-            let svg = svg.replace(r##"<?xml version="1.0" encoding="UTF-8" standalone="no"?>"##, "");
+            let svg = svg.replace(
+                r##"<?xml version="1.0" encoding="UTF-8" standalone="no"?>"##,
+                "",
+            );
 
             // https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/xlink:href
             let svg = svg.replace("xlink:href", "href");
@@ -101,7 +108,9 @@ fn main() {
             let remainder = comment_regex.replace_all(&remainder, "").into_owned();
 
             // Yew's [`html!`] macro requires quoted, bracketed strings.
-            let remainder = text_regex.replace_all(&remainder, r##">{"$1"}<"##).into_owned();
+            let remainder = text_regex
+                .replace_all(&remainder, r##">{"$1"}<"##)
+                .into_owned();
 
             let mut replacement = format!(
                 r#"xmlns="http://www.w3.org/2000/svg" data-license="{}" width={{width.clone()}} height={{height.clone()}} onclick={{onclick.clone()}} oncontextmenu={{oncontextmenu.clone()}} class={{class.clone()}} style={{style.clone()}}"#,
@@ -122,7 +131,9 @@ fn main() {
 
             first_tag = first_tag.replace(r#"xmlns="http://www.w3.org/2000/svg""#, &replacement);
 
-            let svg = first_tag + "if let Some(title) = title.clone() { <title>{title}</title> }" + &remainder;
+            let svg = first_tag
+                + "if let Some(title) = title.clone() { <title>{title}</title> }"
+                + &remainder;
             let svg_tokens = TokenStream::from_str(&svg).expect(&path);
 
             let function_name = name.to_case(Case::Snake);
@@ -154,7 +165,11 @@ fn main() {
             };
 
             let output = tokens.to_string(); // reformat(tokens.to_string(), true).unwrap();
-            write(format!("src/generated/{}/{}.rs", feature_name, function_name), output).unwrap();
+            write(
+                format!("src/generated/{}/{}.rs", feature_name, function_name),
+                output,
+            )
+            .unwrap();
 
             function_mods.push(quote! {
                 #[cfg(feature = #variant_name)]
@@ -167,9 +182,15 @@ fn main() {
             });
         }
 
-        let children: Vec<_> = collection_feature.children.iter().map(|f| quote!{
-            feature = #f
-        }).collect();
+        let children: Vec<_> = collection_feature
+            .children
+            .iter()
+            .map(|f| {
+                quote! {
+                    feature = #f
+                }
+            })
+            .collect();
 
         imports.push(quote! {
             #[cfg(any(
@@ -290,10 +311,6 @@ fn reformat(text: impl std::fmt::Display, included: bool) -> Result<String, Stri
     let output = rustfmt.wait_with_output().map_err(|e| e.to_string())?;
     let stdout = String::from_utf8(output.stdout).map_err(|e| e.to_string())?;
     let preamble = "Generated file, do not edit by hand, see `src/generator.rs`";
-    let prefix = if included {
-        "//"
-    } else {
-        "//!"
-    };
+    let prefix = if included { "//" } else { "//!" };
     Ok(format!("{} {}\n\n{}", prefix, preamble, stdout))
 }
