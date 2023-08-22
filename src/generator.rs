@@ -261,6 +261,11 @@ fn main() {
         font_awesome_license,
     );
     generate(
+        "FontAwesomeBrands",
+        "Font-Awesome/svgs/brands",
+        font_awesome_license,
+    );
+    generate(
         "HeroiconsOutline",
         "heroicons/optimized/24/outline",
         heroicons_license,

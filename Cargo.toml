@@ -5048,6 +5048,7 @@ FontAwesomeSolidY = []
 FontAwesomeSolidYenSign = []
 FontAwesomeSolidYinYang = []
 FontAwesomeSolidZ = []
+FontAwesomeBrandsDiscord = []
 HeroiconsMiniSolidAcademicCap = []
 HeroiconsMiniSolidAdjustmentsHorizontal = []
 HeroiconsMiniSolidAdjustmentsVertical = []
@@ -14024,6 +14025,9 @@ font_awesome_solid = [
     "FontAwesomeSolidYenSign",
     "FontAwesomeSolidYinYang",
     "FontAwesomeSolidZ",
+]
+font_awesome_brands = [
+    "FontAwesomeBrandsDiscord"
 ]
 heroicons_mini_solid = [
     "HeroiconsMiniSolidAcademicCap",
