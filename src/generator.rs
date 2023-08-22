@@ -88,6 +88,11 @@ fn main() {
             let svg = svg.replace("xlink:href", "href");
             let svg = svg.replace(r#"xmlns:xlink="http://www.w3.org/1999/xlink""#, "");
 
+            // warning: The tag 'clipPath' is not matching its normalized form 'clippath'. If you
+            // want to keep this form, change this to a dynamic tag `@{"clipPath"}`.
+            let svg = svg.replace("<clipPath ", "<clippath ");
+            let svg = svg.replace("</clipPath>", "</clippath>");
+
             let (first_tag, remainder) = svg.split_once('>').unwrap();
             let mut first_tag = first_tag.to_owned() + ">";
             let remainder = remainder.to_owned();
@@ -210,6 +215,8 @@ fn main() {
     };
 
     let font_awesome_license = r##"Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc."##;
+    let heroicons_license =
+        r##"From https://github.com/tailwindlabs/heroicons - Licensed under MIT"##;
 
     generate(
         "Bootstrap",
@@ -254,12 +261,39 @@ fn main() {
         font_awesome_license,
     );
     generate(
+        "HeroiconsOutline",
+        "heroicons/optimized/24/outline",
+        heroicons_license,
+    );
+    generate(
+        "HeroiconsSolid",
+        "heroicons/optimized/24/solid",
+        heroicons_license,
+    );
+    generate(
+        "HeroiconsMiniSolid",
+        "heroicons/optimized/20/solid",
+        heroicons_license,
+    );
+    generate(
+        "Lucide",
+        "lucide/icons",
+        r##"From https://github.com/lucide-icons/lucide - Licensed under ISC"##,
+    );
+    generate(
         "Octicons",
         "octicons/icons",
         r##"From https://github.com/primer/octicons - (c) GitHub, Inc."##,
     );
+    generate(
+        "SimpleIcons",
+        "simple-icons/icons",
+        r##"From https://github.com/simple-icons/simple-icons - Licensed under CC0; check brand guidelines"##,
+    );
 
     let tokens = quote! {
+        /// Identifies which icon to render. Variants are all disabled by default, but can be
+        /// enabled by adding the feature flag of the same name.
         #[derive(Copy, Clone, Eq, PartialEq, Debug)]
         #[cfg_attr(feature = "iterate_icon_id", derive(enum_iterator::IntoEnumIterator))]
         #[non_exhaustive]
@@ -267,6 +301,8 @@ fn main() {
             #(#variants),*
         }
 
+        /// Helper function to get SVG HTML. Made public just in case you don't want the overhead
+        /// of a component.
         pub fn get_svg(props: &crate::IconProps) -> yew::Html {
             match props.icon_id {
                 #(#cases),*

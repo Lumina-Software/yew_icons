@@ -1,3 +1,5 @@
+#![doc = include_str!("../README.md")]
+
 #[cfg(not(feature = "generator"))]
 mod generated;
 #[cfg(not(feature = "generator"))]
@@ -9,6 +11,7 @@ use yew::prelude::*;
 #[cfg(not(feature = "generator"))]
 use yew::virtual_dom::AttrValue;
 
+/// For customizing icon rendering. Only `icon_id` is required.
 #[cfg(not(feature = "generator"))]
 #[derive(Properties, PartialEq)]
 pub struct IconProps {
@@ -33,6 +36,22 @@ pub struct IconProps {
     pub style: Option<AttrValue>,
 }
 
+/// Renders a SVG icon. See [IconProps] for more information.
+///
+/// # Example
+///
+/// ```rust
+/// use yew::prelude::*;
+/// use yew_icons::{Icon, IconId};
+///
+/// html!{
+///     <>
+///         <Icon icon_id={IconId::LucideArrowLeftCircle}/>
+///         <Icon icon_id={IconId::LucideArrowUpCircle} width={"2em".to_owned()} height={"2em".to_owned()}/>
+///         <Icon icon_id={IconId::LucideArrowRightCircle} onclick={Callback::from(|_: MouseEvent| {})}/>
+///     </>
+/// }
+/// ```
 #[cfg(not(feature = "generator"))]
 #[function_component(Icon)]
 pub fn icon(props: &IconProps) -> Html {
@@ -48,11 +67,17 @@ mod test {
     #[tokio::test]
     async fn test() {
         for icon_id in IconId::into_enum_iter() {
-            let renderer = yew::ServerRenderer::<Icon>::with_props(IconProps {
+            println!("rendering icon {:?}", icon_id);
+            let icon_id = icon_id.clone();
+            let renderer = yew::ServerRenderer::<Icon>::with_props(move || IconProps {
                 icon_id,
                 width: "2em".into(),
                 height: "3em".into(),
                 onclick: Some(Callback::from(|_e: MouseEvent| {})),
+                class: Classes::new(),
+                oncontextmenu: None,
+                style: None,
+                title: None,
             });
 
             let rendered = renderer.render().await;

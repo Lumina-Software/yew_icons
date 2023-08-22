@@ -13,3 +13,12 @@
 [submodule "lipis-flag-icons"]
 	path = lipis-flag-icons
 	url = git@github.com:lipis/flag-icons.git
+[submodule "lucide"]
+	path = lucide
+	url = https://github.com/lucide-icons/lucide
+[submodule "heroicons"]
+	path = heroicons
+	url = https://github.com/tailwindlabs/heroicons
+[submodule "simple-icons"]
+	path = simple-icons
+	url = https://github.com/simple-icons/simple-icons
